@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 function App() {
   const [data, setData] = useState(null);
-  const [location, setLocation] = useState('London');
+  const [location, setLocation] = useState('');
   
-  // This is how we access the key from your .env file safely
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`;
 
@@ -13,7 +12,8 @@ function App() {
     if (event.key === 'Enter') {
       axios.get(url).then((response) => {
         setData(response.data);
-        console.log(response.data); // Check your browser console to see the raw data!
+      }).catch((error) => {
+        alert("City not found!");
       });
       setLocation('');
     }
@@ -26,28 +26,26 @@ function App() {
           value={location}
           onChange={event => setLocation(event.target.value)}
           onKeyPress={searchLocation}
-          placeholder="Enter Location"
+          placeholder="Enter Location (e.g. Vadodara)"
           type="text"
         />
       </div>
       
-      <div className="container">
-        <div className="top">
-          <div className="location">
-            {/* Display City Name */}
-            <p>{data ? data.name : "Enter a city..."}</p>
+      {/* Only show the card if we have data */}
+      {data && (
+        <div className="container">
+          <div className="top">
+            <div className="location">
+              <p>{data.name}</p>
+            </div>
+            <div className="temp">
+              <h1>{data.main.temp.toFixed()}°C</h1>
+            </div>
+            <div className="description">
+              <p>{data.weather[0].main}</p>
+            </div>
           </div>
-          <div className="temp">
-            {/* Display Temp (if data exists) */}
-            {data ? <h1>{data.main.temp.toFixed()}°C</h1> : null}
-          </div>
-          <div className="description">
-            {/* Display Weather Description (e.g. "Clouds") */}
-            {data ? <p>{data.weather[0].main}</p> : null}
-          </div>
-        </div>
 
-        {data && (
           <div className="bottom">
             <div className="feels">
               <p className='bold'>{data.main.feels_like.toFixed()}°C</p>
@@ -62,9 +60,17 @@ function App() {
               <p>Wind Speed</p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Placeholder message when no data is loaded */}
+      {!data && (
+        <div className="container" style={{ justifyContent: 'center', minHeight: '200px' }}>
+            <h3>Enter a city to see the weather 🌤️</h3>
+        </div>
+      )}
     </div>
   );
 }
+
 export default App;
