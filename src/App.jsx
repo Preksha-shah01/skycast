@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
@@ -6,7 +6,8 @@ function App() {
   const [location, setLocation] = useState('');
   
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`;
+  // URL for manual search (by city name)
+  const searchUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`;
 
   const backgrounds = {
     Clear: 'url(https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
@@ -19,9 +20,31 @@ function App() {
     Default: 'url(https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)'
   };
 
+  // ✨ NEW: Auto-detect location on first load
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // Fetch weather by Coordinates (lat/lon)
+        const geoUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+        
+        axios.get(geoUrl).then((response) => {
+          setData(response.data);
+          console.log("Auto-detected location:", response.data.name);
+        }).catch((error) => {
+          console.error("Error fetching geolocation data:", error);
+        });
+      }, (error) => {
+        console.log("User denied location access or error occurred.");
+      });
+    }
+  }, []); // Empty dependency array = run once on startup
+
   const searchLocation = (event) => {
     if (event.key === 'Enter') {
-      axios.get(url).then((response) => {
+      axios.get(searchUrl).then((response) => {
         setData(response.data);
       }).catch((error) => {
         alert("City not found!");
@@ -30,7 +53,6 @@ function App() {
     }
   };
 
-  // ✨ NEW: Function to format the date
   const dateBuilder = (d) => {
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -67,12 +89,9 @@ function App() {
       {data && (
         <div className="container">
           <div className="top">
-            
-            {/* ✨ NEW: The Date Display */}
             <div className="date">
                 <p>{dateBuilder(new Date())}</p>
             </div>
-
             <div className="location">
               <p>{data.name}</p>
             </div>
@@ -101,9 +120,9 @@ function App() {
         </div>
       )}
 
-      {!data && (
+       {!data && (
         <div className="container" style={{ justifyContent: 'center', minHeight: '200px' }}>
-            <h3>Enter a city to see the weather 🌤️</h3>
+             <h3>Allow location access<br/>or enter a city 🌤️</h3>
         </div>
       )}
     </div>
