@@ -8,7 +8,6 @@ function App() {
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`;
 
-  // 1. Define our background images
   const backgrounds = {
     Clear: 'url(https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Clouds: 'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80)',
@@ -31,10 +30,22 @@ function App() {
     }
   };
 
-  // 2. Logic to pick the background
+  // ✨ NEW: Function to format the date
+  const dateBuilder = (d) => {
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    let day = days[d.getDay()];
+    let date = d.getDate();
+    let month = months[d.getMonth()];
+    let year = d.getFullYear();
+
+    return `${day}, ${date} ${month} ${year}`
+  }
+
+  // Logic to pick background
   let bgImage = backgrounds.Default;
   if (data && data.weather) {
-    // If the weather condition (e.g. "Rain") exists in our list, use it. Otherwise default.
     const weatherType = data.weather[0].main;
     if (backgrounds[weatherType]) {
       bgImage = backgrounds[weatherType];
@@ -42,9 +53,7 @@ function App() {
   }
 
   return (
-    // 3. Apply the background here
     <div className="app" style={{ backgroundImage: bgImage }}>
-      
       <div className="search">
         <input
           value={location}
@@ -58,6 +67,12 @@ function App() {
       {data && (
         <div className="container">
           <div className="top">
+            
+            {/* ✨ NEW: The Date Display */}
+            <div className="date">
+                <p>{dateBuilder(new Date())}</p>
+            </div>
+
             <div className="location">
               <p>{data.name}</p>
             </div>
@@ -86,9 +101,9 @@ function App() {
         </div>
       )}
 
-       {!data && (
+      {!data && (
         <div className="container" style={{ justifyContent: 'center', minHeight: '200px' }}>
-             <h3>Enter a city to see the weather 🌤️</h3>
+            <h3>Enter a city to see the weather 🌤️</h3>
         </div>
       )}
     </div>
