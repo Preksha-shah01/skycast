@@ -9,12 +9,8 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  /* Darker overlay so text pops */
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)),
-              url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-  background-size: cover;
-  background-position: center;
-  overflow: hidden; /* No scrollbars */
+  background-color: #333; /* Fallback color if image fails */
+  overflow: hidden; /* Prevents scrollbars */
 }
 
 .app {
@@ -25,9 +21,14 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
+  
+  /* ✨ MAGIC SAUCE: These 3 lines make the Dynamic Background work */
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.5s ease-in-out; /* Smooth fade when weather changes */
 }
 
-/* SEARCH BAR */
+/* --- SEARCH BAR --- */
 .search {
   margin-bottom: 2rem;
   z-index: 10;
@@ -57,11 +58,11 @@ input:focus {
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* MAIN CARD CONTAINER */
+/* --- MAIN GLASS CARD --- */
 .container {
   width: 90%;
-  max-width: 450px; /* Nicer phone width */
-  background: rgba(255, 255, 255, 0.15); /* Glass effect */
+  max-width: 450px; /* Looks great on mobile & desktop */
+  background: rgba(255, 255, 255, 0.15); /* The Glass Effect */
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
@@ -74,7 +75,7 @@ input:focus {
   min-height: 400px;
 }
 
-/* TOP SECTION (City, Temp, Desc) */
+/* --- TOP SECTION (City, Temp, Desc) --- */
 .top {
   display: flex;
   flex-direction: column;
@@ -101,10 +102,9 @@ input:focus {
   font-size: 1.5rem;
   margin: 0;
   text-transform: capitalize;
-  /* Removed the weird rotation! */
 }
 
-/* BOTTOM SECTION (Stats) */
+/* --- BOTTOM SECTION (Stats Row) --- */
 .bottom {
   display: flex;
   justify-content: space-between;
