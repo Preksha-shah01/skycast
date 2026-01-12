@@ -120,9 +120,9 @@ function App() {
         </div>
       )}
 
-       {!data && (
+      {!data && (
         <div className="container" style={{ justifyContent: 'center', minHeight: '200px' }}>
-             <h3>Allow location access<br/>or enter a city 🌤️</h3>
+            <h3>Allow location access<br/>or enter a city 🌤️</h3>
         </div>
       )}
     </div>
