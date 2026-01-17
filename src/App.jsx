@@ -111,6 +111,7 @@ function App() {
         {!loading && data && (
           <>
             {/* 👈 LEFT PANEL: VISUALS */}
+            {/* 👈 LEFT PANEL: VISUALS (Updated with Icon) */}
             <div className="left-panel">
               <div className="date-container">
                 <p>{dateBuilder(new Date())}</p>
@@ -118,6 +119,15 @@ function App() {
               </div>
               
               <div className="temp-container">
+                 {/* ✨ NEW: Dynamic Weather Icon */}
+                 <div className="icon-box">
+                   <img 
+                     className="weather-icon"
+                     src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`} 
+                     alt="weather icon" 
+                   />
+                 </div>
+
                  <div className="main-temp"><h1>{data.main.temp.toFixed()}°</h1></div>
                  <div className="weather-desc">
                     <p>{data.weather[0].main}</p>

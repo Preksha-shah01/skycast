@@ -53,6 +53,31 @@ body {
   text-align: left;
 }
 
+.temp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+}
+
+.weather-icon {
+  width: 80px;  /* Size of the icon */
+  height: 80px;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); /* Cool glow effect */
+  margin-left: -15px; /* Pull it slightly left to align with text */
+}
+
+.main-temp h1 {
+  font-size: 6rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+}
+
 .date-container p {
   font-size: 1.1rem;
   opacity: 0.9;
