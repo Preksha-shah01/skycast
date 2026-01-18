@@ -8,6 +8,9 @@ function App() {
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  
+  // ✨ NEW: State for Unit ('C' or 'F')
+  const [unit, setUnit] = useState('C');
 
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
@@ -15,12 +18,8 @@ function App() {
     Clear: 'url(https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Clouds: 'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80)',
     Rain: 'url(https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
-    Drizzle: 'url(https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Snow: 'url(https://images.unsplash.com/photo-1491002052546-bf38f186af56?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
-    
     Thunderstorm: 'url(https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
-    Mist: 'url(https://images.unsplash.com/photo-1543968996-ee822b8176ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
-    Haze: 'url(https://images.unsplash.com/photo-1543968996-ee822b8176ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Default: 'url(https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)'
   };
 
@@ -79,6 +78,18 @@ function App() {
     }
   };
 
+  // ✨ NEW: Helper to convert C to F
+  const getTemp = (tempInC) => {
+    if (unit === 'C') return `${tempInC.toFixed()}°C`;
+    const tempInF = (tempInC * 9/5) + 32;
+    return `${tempInF.toFixed()}°F`;
+  };
+
+  // ✨ NEW: Toggle Function
+  const toggleUnit = () => {
+    setUnit(unit === 'C' ? 'F' : 'C');
+  };
+
   const dateBuilder = (d) => {
     let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -103,15 +114,12 @@ function App() {
     <div className="app" style={{ backgroundImage: bgImage }}>
       <Toaster position="top-right" />
 
-      {/* ⚠️ NEW: DASHBOARD LAYOUT START */}
       <div className="dashboard">
         
         {loading && <div className="loader-container"><div className="spinner"></div></div>}
 
         {!loading && data && (
           <>
-            {/* 👈 LEFT PANEL: VISUALS */}
-            {/* 👈 LEFT PANEL: VISUALS (Updated with Icon) */}
             <div className="left-panel">
               <div className="date-container">
                 <p>{dateBuilder(new Date())}</p>
@@ -119,26 +127,23 @@ function App() {
               </div>
               
               <div className="temp-container">
-                 {/* ✨ NEW: Dynamic Weather Icon */}
-                 <div className="icon-box">
-                   <img 
-                     className="weather-icon"
-                     src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`} 
-                     alt="weather icon" 
-                   />
-                 </div>
+                <div className="icon-box">
+                  <img 
+                    className="weather-icon"
+                    src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`} 
+                    alt="weather icon" 
+                  />
+                </div>
 
-                 <div className="main-temp"><h1>{data.main.temp.toFixed()}°</h1></div>
-                 <div className="weather-desc">
+                 {/* ✨ UPDATED: Uses getTemp() function */}
+                <div className="main-temp"><h1>{getTemp(data.main.temp)}</h1></div>
+                <div className="weather-desc">
                     <p>{data.weather[0].main}</p>
-                 </div>
+              </div>
               </div>
             </div>
 
-            {/* 👉 RIGHT PANEL: DATA & CONTROLS */}
             <div className="right-panel">
-              
-              {/* Search Section */}
               <div className="search-section">
                 <div className="search-box">
                   <input
@@ -148,8 +153,24 @@ function App() {
                     placeholder="Change City..."
                     type="text"
                   />
+                  {/* ✨ NEW: Toggle Button absolute positioned inside or near input */}
                 </div>
-                {/* History Chips */}
+                
+                {/* ✨ NEW: Unit Toggle Button placed nicely below search */}
+                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'10px'}}>
+                  <button onClick={toggleUnit} style={{
+                      background: 'rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.4)',
+                      color: 'white',
+                      padding: '5px 15px',
+                      borderRadius: '20px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                  }}>
+                      Switch to {unit === 'C' ? 'Fahrenheit' : 'Celsius'}
+                  </button>
+                </div>
+
                 {history.length > 0 && (
                   <div className="history-row">
                     {history.map((city, index) => (
@@ -161,7 +182,6 @@ function App() {
                 )}
               </div>
 
-              {/* Stats Grid */}
               <div className="details-grid">
                 <div className="detail-card">
                    <span>Humidity</span>
@@ -181,7 +201,6 @@ function App() {
                 </div>
               </div>
 
-              {/* 5-Day Forecast List */}
               {forecast.length > 0 && (
                 <div className="forecast-section">
                   <p style={{fontSize: '0.9rem', fontWeight: '600', marginBottom:'10px'}}>Next 5 Days</p>
@@ -190,7 +209,8 @@ function App() {
                       <div key={index} className="forecast-item">
                         <span className="forecast-day">{getDayName(day.dt_txt)}</span>
                         <span className="forecast-desc">{day.weather[0].main}</span>
-                        <span className="forecast-temp">{day.main.temp.toFixed()}°</span>
+                        {/* ✨ UPDATED: Uses getTemp() function */}
+                        <span className="forecast-temp">{getTemp(day.main.temp)}</span>
                       </div>
                     ))}
                   </div>
