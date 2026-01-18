@@ -9,7 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   
-  // ✨ NEW: State for Unit ('C' or 'F')
+  // State for Unit ('C' or 'F')
   const [unit, setUnit] = useState('C');
 
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
@@ -18,8 +18,11 @@ function App() {
     Clear: 'url(https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Clouds: 'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80)',
     Rain: 'url(https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
+    // ❄️ Beautiful Snowy Background
     Snow: 'url(https://images.unsplash.com/photo-1491002052546-bf38f186af56?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Thunderstorm: 'url(https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
+    Mist: 'url(https://images.unsplash.com/photo-1543968996-ee822b8176ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
+    Haze: 'url(https://images.unsplash.com/photo-1543968996-ee822b8176ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Default: 'url(https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)'
   };
 
@@ -78,14 +81,13 @@ function App() {
     }
   };
 
-  // ✨ NEW: Helper to convert C to F
+  // Helper to convert C to F
   const getTemp = (tempInC) => {
-    if (unit === 'C') return `${tempInC.toFixed()}°C`;
+    if (unit === 'C') return `${tempInC.toFixed()}°`;
     const tempInF = (tempInC * 9/5) + 32;
-    return `${tempInF.toFixed()}°F`;
+    return `${tempInF.toFixed()}°`;
   };
 
-  // ✨ NEW: Toggle Function
   const toggleUnit = () => {
     setUnit(unit === 'C' ? 'F' : 'C');
   };
@@ -120,6 +122,7 @@ function App() {
 
         {!loading && data && (
           <>
+            {/* 👈 LEFT PANEL: VISUALS */}
             <div className="left-panel">
               <div className="date-container">
                 <p>{dateBuilder(new Date())}</p>
@@ -127,22 +130,25 @@ function App() {
               </div>
               
               <div className="temp-container">
-                <div className="icon-box">
-                  <img 
-                    className="weather-icon"
-                    src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`} 
-                    alt="weather icon" 
-                  />
-                </div>
+                 <div className="icon-box">
+                   <img 
+                     className="weather-icon"
+                     src={`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`} 
+                     alt="weather icon" 
+                   />
+                 </div>
 
-                 {/* ✨ UPDATED: Uses getTemp() function */}
-                <div className="main-temp"><h1>{getTemp(data.main.temp)}</h1></div>
-                <div className="weather-desc">
+                 <div className="main-temp">
+                    <h1>{getTemp(data.main.temp)}</h1>
+                 </div>
+                 
+                 <div className="weather-desc">
                     <p>{data.weather[0].main}</p>
-              </div>
+                 </div>
               </div>
             </div>
 
+            {/* 👉 RIGHT PANEL: DATA & CONTROLS */}
             <div className="right-panel">
               <div className="search-section">
                 <div className="search-box">
@@ -153,22 +159,20 @@ function App() {
                     placeholder="Change City..."
                     type="text"
                   />
-                  {/* ✨ NEW: Toggle Button absolute positioned inside or near input */}
                 </div>
-                
-                {/* ✨ NEW: Unit Toggle Button placed nicely below search */}
-                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'10px'}}>
-                  <button onClick={toggleUnit} style={{
-                      background: 'rgba(255,255,255,0.2)',
-                      border: '1px solid rgba(255,255,255,0.4)',
-                      color: 'white',
-                      padding: '5px 15px',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold'
-                  }}>
-                      Switch to {unit === 'C' ? 'Fahrenheit' : 'Celsius'}
-                  </button>
+
+                {/* ✨ TOGGLE SWITCH */}
+                <div className="toggle-container">
+                  <span className="toggle-label" style={{opacity: unit==='C' ? 1 : 0.5}}>°C</span>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      checked={unit === 'F'} 
+                      onChange={toggleUnit} 
+                    />
+                    <span className="slider"></span>
+                  </label>
+                  <span className="toggle-label" style={{opacity: unit==='F' ? 1 : 0.5}}>°F</span>
                 </div>
 
                 {history.length > 0 && (
@@ -209,7 +213,6 @@ function App() {
                       <div key={index} className="forecast-item">
                         <span className="forecast-day">{getDayName(day.dt_txt)}</span>
                         <span className="forecast-desc">{day.weather[0].main}</span>
-                        {/* ✨ UPDATED: Uses getTemp() function */}
                         <span className="forecast-temp">{getTemp(day.main.temp)}</span>
                       </div>
                     ))}
