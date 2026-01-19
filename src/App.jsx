@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
+// ✨ Imports from our new modular files
+import { dateBuilder, getTemp } from './utils/helpers';
+import WeatherStats from './components/WeatherStats';
+import ForecastList from './components/ForecastList';
+
 function App() {
   const [data, setData] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  
-  // State for Unit ('C' or 'F')
   const [unit, setUnit] = useState('C');
 
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
@@ -18,7 +21,6 @@ function App() {
     Clear: 'url(https://images.unsplash.com/photo-1601297183305-6df142704ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Clouds: 'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?ixlib=rb-1.2.1&auto=format&fit=crop&w=1951&q=80)',
     Rain: 'url(https://images.unsplash.com/photo-1519692933481-e162a57d6721?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
-    // ❄️ Beautiful Snowy Background
     Snow: 'url(https://images.unsplash.com/photo-1491002052546-bf38f186af56?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Thunderstorm: 'url(https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
     Mist: 'url(https://images.unsplash.com/photo-1543968996-ee822b8176ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80)',
@@ -81,29 +83,8 @@ function App() {
     }
   };
 
-  // Helper to convert C to F
-  const getTemp = (tempInC) => {
-    if (unit === 'C') return `${tempInC.toFixed()}°`;
-    const tempInF = (tempInC * 9/5) + 32;
-    return `${tempInF.toFixed()}°`;
-  };
-
   const toggleUnit = () => {
     setUnit(unit === 'C' ? 'F' : 'C');
-  };
-
-  const dateBuilder = (d) => {
-    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-  }
-
-  const formatTime = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const getDayName = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString("en-US", { weekday: 'short' });
   };
 
   let bgImage = backgrounds.Default;
@@ -117,7 +98,6 @@ function App() {
       <Toaster position="top-right" />
 
       <div className="dashboard">
-        
         {loading && <div className="loader-container"><div className="spinner"></div></div>}
 
         {!loading && data && (
@@ -137,11 +117,9 @@ function App() {
                      alt="weather icon" 
                    />
                  </div>
-
                  <div className="main-temp">
-                    <h1>{getTemp(data.main.temp)}</h1>
+                    <h1>{getTemp(data.main.temp, unit)}</h1>
                  </div>
-                 
                  <div className="weather-desc">
                     <p>{data.weather[0].main}</p>
                  </div>
@@ -161,15 +139,10 @@ function App() {
                   />
                 </div>
 
-                {/* ✨ TOGGLE SWITCH */}
                 <div className="toggle-container">
                   <span className="toggle-label" style={{opacity: unit==='C' ? 1 : 0.5}}>°C</span>
                   <label className="switch">
-                    <input 
-                      type="checkbox" 
-                      checked={unit === 'F'} 
-                      onChange={toggleUnit} 
-                    />
+                    <input type="checkbox" checked={unit === 'F'} onChange={toggleUnit} />
                     <span className="slider"></span>
                   </label>
                   <span className="toggle-label" style={{opacity: unit==='F' ? 1 : 0.5}}>°F</span>
@@ -186,38 +159,11 @@ function App() {
                 )}
               </div>
 
-              <div className="details-grid">
-                <div className="detail-card">
-                   <span>Humidity</span>
-                   <p>{data.main.humidity}%</p>
-                </div>
-                <div className="detail-card">
-                   <span>Wind</span>
-                   <p>{data.wind.speed} <small>mph</small></p>
-                </div>
-                <div className="detail-card">
-                   <span>Sunrise</span>
-                   <p>{formatTime(data.sys.sunrise)}</p>
-                </div>
-                <div className="detail-card">
-                   <span>Sunset</span>
-                   <p>{formatTime(data.sys.sunset)}</p>
-                </div>
-              </div>
-
+              {/* ✨ MODULAR COMPONENTS BEING USED HERE */}
+              <WeatherStats data={data} />
+              
               {forecast.length > 0 && (
-                <div className="forecast-section">
-                  <p style={{fontSize: '0.9rem', fontWeight: '600', marginBottom:'10px'}}>Next 5 Days</p>
-                  <div className="forecast-list">
-                    {forecast.map((day, index) => (
-                      <div key={index} className="forecast-item">
-                        <span className="forecast-day">{getDayName(day.dt_txt)}</span>
-                        <span className="forecast-desc">{day.weather[0].main}</span>
-                        <span className="forecast-temp">{getTemp(day.main.temp)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ForecastList forecast={forecast} unit={unit} />
               )}
             </div>
           </>
