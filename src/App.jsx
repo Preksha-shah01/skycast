@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import SoundPlayer from './components/SoundPlayer';
 
 // ✨ Imports from our new modular files
 import { dateBuilder, getTemp } from './utils/helpers';
