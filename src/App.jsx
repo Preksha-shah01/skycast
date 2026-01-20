@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-import SoundPlayer from './components/SoundPlayer';
 
-// ✨ Imports from our new modular files
+// ✨ Imports from our modular files
 import { dateBuilder, getTemp } from './utils/helpers';
 import WeatherStats from './components/WeatherStats';
 import ForecastList from './components/ForecastList';
+import SoundPlayer from './components/SoundPlayer'; // 🔊 New Import
 
 function App() {
   const [data, setData] = useState(null);
@@ -98,11 +98,16 @@ function App() {
     <div className="app" style={{ backgroundImage: bgImage }}>
       <Toaster position="top-right" />
 
-      <div className="dashboard">
+      {/* Added position relative so the sound button can float inside */}
+      <div className="dashboard" style={{ position: 'relative' }}> 
+        
         {loading && <div className="loader-container"><div className="spinner"></div></div>}
 
         {!loading && data && (
           <>
+            {/* 🔊 SOUND PLAYER COMPONENT */}
+            <SoundPlayer weatherCondition={data.weather[0].main} />
+
             {/* 👈 LEFT PANEL: VISUALS */}
             <div className="left-panel">
               <div className="date-container">
@@ -160,9 +165,10 @@ function App() {
                 )}
               </div>
 
-              {/* ✨ MODULAR COMPONENTS BEING USED HERE */}
+              {/* Modular Component for Grid Stats */}
               <WeatherStats data={data} />
               
+              {/* Modular Component for Forecast List */}
               {forecast.length > 0 && (
                 <ForecastList forecast={forecast} unit={unit} />
               )}
